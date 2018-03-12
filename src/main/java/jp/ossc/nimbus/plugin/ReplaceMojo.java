@@ -102,9 +102,9 @@ public class ReplaceMojo extends AbstractMojo {
     
     private static final String REPLACE_EMPTY_STR = "";
     
-    private static final String REPLACE_START_STR = "/* **Java Version Difference Commoent Start**";
+    private static final String REPLACE_START_STR = "/* **Java Version Difference Comment Start**";
     
-    private static final String REPLACE_END_STR = "**Java Version Difference Commoent End** */";
+    private static final String REPLACE_END_STR = "**Java Version Difference Comment End** */";
     
     /**
      * Execute.
