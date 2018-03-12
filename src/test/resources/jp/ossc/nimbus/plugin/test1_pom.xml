@@ -11,11 +11,12 @@
                 <artifactId>commentout-by-javaversion-maven-plugin</artifactId>
                 <version>1.0</version>
                 <configuration>
-                    <fromDir>${basedir}/src/test/resources/jp/ossc/nimbus/plugin/from</fromDir>
-                    <toDir>${basedir}/src/test/resources/jp/ossc/nimbus/plugin/to</toDir>
+                    <fromDir>${basedir}/src/test/resources/jp/ossc/nimbus/plugin</fromDir>
+                    <toDir>${basedir}/target/test/resources/jp/ossc/nimbus/plugin</toDir>
                     <fromFileExtention>txt</fromFileExtention>
                     <toFileExtention>java</toFileExtention>
                     <encoding>UTF-8</encoding>
+                    <javaVersion>8</javaVersion>
                     <checkJavaVersions>
                         <param>6</param>
                         <param>7</param>

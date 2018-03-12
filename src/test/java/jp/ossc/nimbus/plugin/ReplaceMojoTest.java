@@ -14,7 +14,6 @@ public class ReplaceMojoTest extends AbstractMojoTestCase {
      */
     protected void setUp() throws Exception {
         super.setUp();
-        FileUtility.deleteAllTree(new File(getBasedir(), "src/test/resources/jp/ossc/nimbus/plugin/to"), false);
     }
     
     /**
@@ -22,7 +21,6 @@ public class ReplaceMojoTest extends AbstractMojoTestCase {
      */
     protected void tearDown() throws Exception {
         super.tearDown();
-        FileUtility.deleteAllTree(new File(getBasedir(), "src/test/resources/jp/ossc/nimbus/plugin/to"), false);
     }
     
     @Test
@@ -30,19 +28,19 @@ public class ReplaceMojoTest extends AbstractMojoTestCase {
         File testPom = new File(getBasedir(), "src/test/resources/jp/ossc/nimbus/plugin/test1_pom.xml");
         ReplaceMojo mojo = (ReplaceMojo) lookupMojo("replace", testPom);
         mojo.execute();
-        File file = new File(getBasedir(), "src/test/resources/jp/ossc/nimbus/plugin/to/1/1_1/1_1.java");
+        File file = new File(getBasedir(), "target/test/resources/jp/ossc/nimbus/plugin/1/1_1/1_1.java");
         assertEquals(file.exists(), true);
-        assertEquals(compareContents(file, new File(getBasedir(), "src/test/resources/jp/ossc/nimbus/plugin/from/1/1_1/answer.java")), true);
-        file = new File(getBasedir(), "src/test/resources/jp/ossc/nimbus/plugin/to/1/1_2/1_2.java");
+        assertEquals(compareContents(file, new File(getBasedir(), "src/test/resources/jp/ossc/nimbus/plugin/1/1_1/answer.java")), true);
+        file = new File(getBasedir(), "target/test/resources/jp/ossc/nimbus/plugin/1/1_2/1_2.java");
         assertEquals(file.exists(), false);
-        file = new File(getBasedir(), "src/test/resources/jp/ossc/nimbus/plugin/to/2/2.java");
+        file = new File(getBasedir(), "target/test/resources/jp/ossc/nimbus/plugin/2/2.java");
         assertEquals(file.exists(), true);
-        assertEquals(compareContents(file, new File(getBasedir(), "src/test/resources/jp/ossc/nimbus/plugin/from/2/answer.java")), true);
-        file = new File(getBasedir(), "src/test/resources/jp/ossc/nimbus/plugin/to/2_1/2_1.java");
+        assertEquals(compareContents(file, new File(getBasedir(), "src/test/resources/jp/ossc/nimbus/plugin/2/answer.java")), true);
+        file = new File(getBasedir(), "target/test/resources/jp/ossc/nimbus/plugin/2_1/2_1.java");
         assertEquals(file.exists(), false);
-        file = new File(getBasedir(), "src/test/resources/jp/ossc/nimbus/plugin/to/2/2_2/2_2.java");
+        file = new File(getBasedir(), "target/test/resources/jp/ossc/nimbus/plugin/2/2_2/2_2.java");
         assertEquals(file.exists(), true);
-        assertEquals(compareContents(file, new File(getBasedir(), "src/test/resources/jp/ossc/nimbus/plugin/from/2/2_2/answer.java")), true);
+        assertEquals(compareContents(file, new File(getBasedir(), "src/test/resources/jp/ossc/nimbus/plugin/2/2_2/answer.java")), true);
     }
     
     private boolean compareContents(File f1, File f2) throws IOException {

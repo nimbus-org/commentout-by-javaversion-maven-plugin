@@ -249,17 +249,6 @@ public class ReplaceMojo extends AbstractMojo {
                     } else if (compareTo > 0) {
                         line = line.replaceAll("@START=JAVA" + checkJavaVersion + "@", REPLACE_START_STR);
                         line = line.replaceAll("@END=JAVA" + checkJavaVersion + "@", REPLACE_END_STR);
-                        line = line.replaceAll("@START>JAVA" + checkJavaVersion + "@", REPLACE_START_STR);
-                        line = line.replaceAll("@END>JAVA" + checkJavaVersion + "@", REPLACE_END_STR);
-                        line = line.replaceAll("@START>=JAVA" + checkJavaVersion + "@", REPLACE_START_STR);
-                        line = line.replaceAll("@END>=JAVA" + checkJavaVersion + "@", REPLACE_END_STR);
-                        line = line.replaceAll("@START<JAVA" + checkJavaVersion + "@", REPLACE_EMPTY_STR);
-                        line = line.replaceAll("@END<JAVA" + checkJavaVersion + "@", REPLACE_EMPTY_STR);
-                        line = line.replaceAll("@START<=JAVA" + checkJavaVersion + "@", REPLACE_EMPTY_STR);
-                        line = line.replaceAll("@END<=JAVA" + checkJavaVersion + "@", REPLACE_EMPTY_STR);
-                    } else {
-                        line = line.replaceAll("@START=JAVA" + checkJavaVersion + "@", REPLACE_START_STR);
-                        line = line.replaceAll("@END=JAVA" + checkJavaVersion + "@", REPLACE_END_STR);
                         line = line.replaceAll("@START>JAVA" + checkJavaVersion + "@", REPLACE_EMPTY_STR);
                         line = line.replaceAll("@END>JAVA" + checkJavaVersion + "@", REPLACE_EMPTY_STR);
                         line = line.replaceAll("@START>=JAVA" + checkJavaVersion + "@", REPLACE_EMPTY_STR);
@@ -268,6 +257,17 @@ public class ReplaceMojo extends AbstractMojo {
                         line = line.replaceAll("@END<JAVA" + checkJavaVersion + "@", REPLACE_END_STR);
                         line = line.replaceAll("@START<=JAVA" + checkJavaVersion + "@", REPLACE_START_STR);
                         line = line.replaceAll("@END<=JAVA" + checkJavaVersion + "@", REPLACE_END_STR);
+                    } else {
+                        line = line.replaceAll("@START=JAVA" + checkJavaVersion + "@", REPLACE_START_STR);
+                        line = line.replaceAll("@END=JAVA" + checkJavaVersion + "@", REPLACE_END_STR);
+                        line = line.replaceAll("@START>JAVA" + checkJavaVersion + "@", REPLACE_START_STR);
+                        line = line.replaceAll("@END>JAVA" + checkJavaVersion + "@", REPLACE_END_STR);
+                        line = line.replaceAll("@START>=JAVA" + checkJavaVersion + "@", REPLACE_START_STR);
+                        line = line.replaceAll("@END>=JAVA" + checkJavaVersion + "@", REPLACE_END_STR);
+                        line = line.replaceAll("@START<JAVA" + checkJavaVersion + "@", REPLACE_EMPTY_STR);
+                        line = line.replaceAll("@END<JAVA" + checkJavaVersion + "@", REPLACE_EMPTY_STR);
+                        line = line.replaceAll("@START<=JAVA" + checkJavaVersion + "@", REPLACE_EMPTY_STR);
+                        line = line.replaceAll("@END<=JAVA" + checkJavaVersion + "@", REPLACE_EMPTY_STR);
                     }
                 }
                 sb.append(line);
@@ -293,7 +293,6 @@ public class ReplaceMojo extends AbstractMojo {
             pw = new PrintWriter(new BufferedWriter(writer));
             pw.print(sb.toString());
             pw.flush();
-            pw.close();
         } finally {
             if (pw != null) {
                 try {
