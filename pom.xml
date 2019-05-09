@@ -2,11 +2,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.nimbus-org</groupId>
-    <artifactId>commentout-by-javaversion-maven-plugin</artifactId>
-    <version>1.1</version>
+    <artifactId>nimbus-javaversion-filecontrol-maven-plugin</artifactId>
+    <version>1.0</version>
     <packaging>maven-plugin</packaging>
-    <name>commentout-by-javaversion-maven-plugin</name>
-    <url>https://github.com/nimbus-org/commentout-by-javaversion-maven-plugin</url>
+    <name>nimbus-javaversion-filecontrol-maven-plugin</name>
+    <url>https://github.com/nimbus-org/nimbus-javaversion-filecontrol-maven-plugin</url>
     <licenses>
         <license>
             <name>3-Clause BSD License</name>
@@ -53,6 +53,7 @@
     <properties>
         <dryRun>true</dryRun>
         <github.site.skip>true</github.site.skip>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Github auth for setting.xml-->
         <github.global.server>github</github.global.server>
     </properties>

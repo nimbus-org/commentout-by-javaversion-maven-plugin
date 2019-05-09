@@ -1,7 +1,7 @@
-# commentout-by-javaversion-maven-plugin
+# nimbus-javaversion-filecontrol-maven-plugin
 
 ## 機能概要
-コンパイルするJavaバージョン毎の差異を吸収するための、コメント化（文字列置換）用プラグインです。
+コンパイルするJavaバージョン毎の差異を吸収するための、コメント化（文字列置換）、ファイル名変換コピーを行うプラグインです。
 
 ## インストール方法
 
@@ -12,8 +12,8 @@ Mavenのpom.xmlに以下の記載を追加する。
             ・・・
             <plugin>
                 <groupId>com.github.nimbus-org</groupId>
-                <artifactId>commentout-by-javaversion-maven-plugin</artifactId>
-                <version>1.0</version>
+                <artifactId>nimbus-javaversion-filecontrol-maven-plugin</artifactId>
+                <version>X.X</version>
                 <configuration>
                     ・・・
                 </configuration>
@@ -22,7 +22,7 @@ Mavenのpom.xmlに以下の記載を追加する。
         </plugins>
 ```
 
-## 使用方法（設定）
+## 使用方法（replace）
 
 ### configuration
 
@@ -56,25 +56,33 @@ Mavenのpom.xmlに以下の記載を追加する。
             <plugin>
                 <groupId>com.github.nimbus-org</groupId>
                 <artifactId>commentout-by-javaversion-maven-plugin</artifactId>
-                <version>1.0</version>
-                <configuration>
-                    <javaVersion>8</javaVersion>
-                    <checkJavaVersions>
-                        <param>6</param>
-                        <param>7</param>
-                        <param>8</param>
-                        <param>9</param>
-                    </checkJavaVersions>
-                    <fromDir>${basedir}/src/main/java</fromDir>
-                    <toDir>${basedir}/target/gen-src</toDir>
-                    <replaceTargetDirs>
-                        <param>jp/ossc/nimbus/core/**</param>
-                        <param>jp/ossc/nimbus/service/**</param>
-                    </replaceTargetDirs>
-                    <fromFileExtention>javapp</fromFileExtention>
-                    <toFileExtention>java</toFileExtention>
-                    <encoding>UTF-8</encoding>
-                </configuration>
+                <executions>
+                    <execution>
+                        <id>replace</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>replace</goal>
+                        </goals>
+                        <configuration>
+                            <javaVersion>8</javaVersion>
+                            <fromDir>${basedir}/src/main/java</fromDir>
+                            <toDir>${basedir}/target/gen-src</toDir>
+                            <fromFileExtention>javapp</fromFileExtention>
+                            <toFileExtention>java</toFileExtention>
+                            <encoding>UTF-8</encoding>
+                            <checkJavaVersions>
+                                <param>6</param>
+                                <param>7</param>
+                                <param>8</param>
+                                <param>9</param>
+                            </checkJavaVersions>
+                            <replaceTargetDirs>
+                                <param>jp/ossc/nimbus/**</param>
+                            </replaceTargetDirs>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             </plugin>
             ・・・
         </plugins>
@@ -128,4 +136,59 @@ import sun.reflect.ReflectionFactory;
 /* **Java Version Difference Comment Start**
 import jdk.internal.reflect.ReflectionFactory;
 **Java Version Difference Comment End** */
+```
+
+
+## 使用方法（copy）
+
+### configuration
+
+| 設定キー | 説明 | 必須 | デフォルト値 | 設定例 |
+|---|---|---|---|---|
+| javaVersion | コンパイルに使用するJavaのバージョン ||System.getProperty("java.specification.version")で取得できるJavaバージョン| 8 |
+| targetJavaVersionAndFiles| Javaのバージョンと置換チェックするファイル | ○ | 無し | 6,jp/ossc/nimbus/**/.*.jpp（※１） |
+| fromDir | 置換元ファイルルートディレクトリ | ○ | 無し | ${basedir}/src/main/java |
+| toDir | 置換後ファイルコピー先ルートディレクトリ | ○ | 無し | ${basedir}/target/gen-src |
+| toFileExtention | 置換後ファイル拡張子 | | java | java |
+
+※１ 複数指定が可能なため、`<param>XXXX</param>`で複数記載する。
+
+### 設定例
+
++ Java8でコンパイル
++ Java6でコンパイルする場合は正規表現（jp/ossc/nimbus/service/\*\*/.\*.jppとjp/ossc/nimbus/util/\*\*/.\*.jpp）をコピー対象とする
++ Java7でコンパイルする場合は正規表現（jp/ossc/nimbus/service/\*\*/.\*.jppとjp/ossc/nimbus/util/\*\*/.\*.jpp）をコピー対象とする
++ Java8でコンパイルする場合は正規表現（jp/ossc/nimbus/service/\*\*/.\*.jppとjp/ossc/nimbus/util/\*\*/.\*.jpp）をコピー対象とする
++ /src/main/java 配下のソースが置換対象
++ /target/gen-src に置換後ファイルを配置
++ 置換後のファイル拡張子はjava
+
+```xml
+        <plugins>
+            ・・・
+            <plugin>
+                <groupId>com.github.nimbus-org</groupId>
+                <artifactId>commentout-by-javaversion-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <javaVersion>8</javaVersion>
+                            <fromDir>${basedir}/src/main/java</fromDir>
+                            <toDir>${basedir}/target/gen-src</toDir>
+                            <targetJavaVersionAndFiles>
+								<param>6,jp/ossc/nimbus/service/**/.*.jpp,jp/ossc/nimbus/util/**/.*.jpp</param>
+								<param>7,jp/ossc/nimbus/service/**/.*.jpp,jp/ossc/nimbus/util/**/.*.jpp</param>
+								<param>8,jp/ossc/nimbus/service/**/.*.jpp,jp/ossc/nimbus/util/**/.*.jpp</param>
+                            </targetJavaVersionAndFiles>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            ・・・
+        </plugins>
 ```
