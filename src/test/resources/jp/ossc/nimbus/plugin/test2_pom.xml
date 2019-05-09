@@ -16,10 +16,6 @@
                     <javaVersion>8</javaVersion>
                     <fromDir>${basedir}/src/test/resources</fromDir>
                     <toDir>${basedir}/target/test/resources</toDir>
-                    <targetJavaVersionAndFiles>
-                        <param>8,jp/ossc/nimbus/plugin/3/.*.jpp</param>
-                    </targetJavaVersionAndFiles>
-                    <toFileExtention>java</toFileExtention>
                 </configuration>
             </plugin>
         </plugins>

@@ -31,17 +31,18 @@
  */
 package jp.ossc.nimbus.plugin;
 
+import java.io.BufferedReader;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
 /**
- * replace
+ * copy
  *
  * @goal copy
  * @phase generate-sources
@@ -57,11 +58,6 @@ public class CopyMojo extends AbstractMojo {
     /**
      * @parameter
      */
-    private String[] targetJavaVersionAndFiles = new String[] {};
-    
-    /**
-     * @parameter
-     */
     private File fromDir;
     
     /**
@@ -72,7 +68,19 @@ public class CopyMojo extends AbstractMojo {
     /**
      * @parameter
      */
+    private String fromFileExtention = "javapp";
+    
+    /**
+     * @parameter
+     */
     private String toFileExtention = "java";
+    
+    /**
+     * @parameter
+     */
+    private String encoding;
+    
+    public static final String JAVA_VERSION = "@JAVA_VERSION@";
     
     /**
      * Execute.
@@ -93,12 +101,6 @@ public class CopyMojo extends AbstractMojo {
                 }
                 getLog().info("check from system javaVersion. javaVersion=" + javaVersion);
             }
-            
-            if(targetJavaVersionAndFiles == null || targetJavaVersionAndFiles.length == 0) {
-                getLog().error("targetJavaVersionAndFiles is null or empty.");
-                throw new MojoExecutionException("targetJavaVersionAndFiles is null or empty.");
-            }
-            getLog().info("targetJavaVersionAndFiles=" + Arrays.asList(targetJavaVersionAndFiles));
             
             if (fromDir == null) {
                 getLog().error("fromDir is null.");
@@ -126,7 +128,18 @@ public class CopyMojo extends AbstractMojo {
                 getLog().error("toDir is not directory.");
                 throw new MojoExecutionException("toDir is not directory.");
             }
-            getLog().info("source replace toDir=" + toDir.getAbsolutePath());
+            getLog().info("source copy toDir=" + toDir.getAbsolutePath());
+            
+            if (fromFileExtention == null) {
+                getLog().error("fromFileExtention is null.");
+                throw new MojoExecutionException("fromFileExtention is null.");
+            } else if ("".equals(fromFileExtention)) {
+                getLog().error("fromFileExtention is empty.");
+                throw new MojoExecutionException("fromFileExtention is empty.");
+            } else if(fromFileExtention.startsWith(".")) {
+                fromFileExtention = fromFileExtention.substring(1);
+            }
+            getLog().info("source copy fromFileExtention=" + fromFileExtention);
             
             if (toFileExtention == null) {
                 getLog().error("toFileExtention is null.");
@@ -139,27 +152,159 @@ public class CopyMojo extends AbstractMojo {
             }
             getLog().info("source copy toFileExtention=" + toFileExtention);
             
-            for(String targetJavaVersionAndFile : targetJavaVersionAndFiles) {
-                String[] strs = targetJavaVersionAndFile.split(",");
-                if(strs.length > 0 && javaVersion.equals(strs[0])) {
-                    FileUtility rFromDir = new FileUtility(fromDir);
-                    List<String> list = new ArrayList<String>(Arrays.asList(strs));
-                    list.remove(0);
-                    for(String targetFile : list) {
-                        File[] copyTargetFiles = rFromDir.listAllTreeFiles(targetFile);
-                        for (File copyTargetFile : copyTargetFiles) {
-                            String tmpFileName = copyTargetFile.getAbsolutePath().substring(fromDir.getAbsolutePath().length());
-                            File toFile = new File(toDir.getAbsolutePath() + tmpFileName.substring(0, tmpFileName.lastIndexOf(".") + 1) + toFileExtention);
-                            FileUtility.dataCopy(copyTargetFile, toFile);
-                            getLog().debug("file copy " + copyTargetFile.getAbsolutePath() + " to " + toFile.getAbsolutePath());
-                        }
-                    }
-                }
+            if(encoding == null || "".equals(encoding)) {
+                getLog().info("source copy encoding is not found config. read or write of the target file is system default encoding.");
+            } else {
+                getLog().info("source copy encoding=" + encoding);
+            }
+            
+            FileUtility rFromDir = new FileUtility(fromDir);
+            File[] copyTargetFiles = rFromDir.listAllTreeFiles("**/.*." + fromFileExtention);
+            for(File copyTargetFile : copyTargetFiles) {
+                checkAndCopy(copyTargetFile);
             }
         } catch (Throwable th) {
             getLog().error(th.getMessage());
             throw new MojoFailureException("copy failed");
         }
+    }
+    
+    private void checkAndCopy(File file) throws Exception {
+        
+        Reader reader = null;
+        BufferedReader br = null;
+        try {
+            boolean isCopyTarget = true;
+            boolean isJavaVersionExists = false;
+            reader = encoding == null ? new InputStreamReader(new FileInputStream(file)) : new InputStreamReader(new FileInputStream(file), encoding);
+            br = new BufferedReader(reader);
+            String line = null;
+            while ((line = br.readLine()) != null) {
+                if(line.indexOf(JAVA_VERSION) != -1) {
+                    isJavaVersionExists = true;
+                    String[] conditions = line.split(JAVA_VERSION);
+                    if(conditions.length != 1 && conditions.length != 2) {
+                        throw new Exception("JavaVersion condition is invalid. condition=" + line);
+                    }
+                    int low_ver = Integer.MIN_VALUE;
+                    String low_con = null;
+                    int high_ver = Integer.MAX_VALUE;
+                    String high_con = null;
+                    int version = Integer.parseInt(javaVersion);
+                    StringBuilder nsb = new StringBuilder();
+                    StringBuilder csb = new StringBuilder();
+                    char[] chars = conditions[0].toCharArray();
+                    for(char c : chars) {
+                        switch(c){
+                            case '0':
+                            case '1':
+                            case '2':
+                            case '3':
+                            case '4':
+                            case '5':
+                            case '6':
+                            case '7':
+                            case '8':
+                            case '9':
+                                nsb.append(c);
+                                break;
+                            case '<':
+                            case '=':
+                                csb.append(c);
+                                break;
+                        }
+                    }
+                    if(nsb.length() != 0 && csb.length() != 0) {
+                        low_ver = Integer.parseInt(nsb.toString());
+                        low_con = csb.toString();
+                    }
+                    if(conditions.length == 2) {
+                        nsb = new StringBuilder();
+                        csb = new StringBuilder();
+                        chars = conditions[1].toCharArray();
+                        for(char c : chars) {
+                            switch(c){
+                                case '0':
+                                case '1':
+                                case '2':
+                                case '3':
+                                case '4':
+                                case '5':
+                                case '6':
+                                case '7':
+                                case '8':
+                                case '9':
+                                    nsb.append(c);
+                                    break;
+                                case '<':
+                                case '=':
+                                    csb.append(c);
+                                    break;
+                            }
+                        }
+                        if(nsb.length() != 0 && csb.length() != 0) {
+                            high_ver = Integer.parseInt(nsb.toString());
+                            high_con = csb.toString();
+                        }
+                    }
+                    if(low_con != null && high_con != null) {
+                        if("<=".equals(low_con)) {
+                            isCopyTarget = (low_ver <= version) && isCopyTarget;
+                        } else if("<".equals(low_con)) {
+                            isCopyTarget = (low_ver < version) && isCopyTarget;
+                        } else if("=".equals(low_con)) {
+                            isCopyTarget = (low_ver == version) && isCopyTarget;
+                        }
+                        if("<=".equals(high_con)) {
+                            isCopyTarget = (version <= high_ver) && isCopyTarget;
+                        } else if("<".equals(high_con)) {
+                            isCopyTarget = (version < high_ver) && isCopyTarget;
+                        } else if("=".equals(high_con)) {
+                            isCopyTarget = (version == high_ver) && isCopyTarget;
+                        }
+                    } else if(low_con != null) {
+                        if("<=".equals(low_con)) {
+                            isCopyTarget = (low_ver <= version) && isCopyTarget;
+                        } else if("<".equals(low_con)) {
+                            isCopyTarget = (low_ver < version) && isCopyTarget;
+                        } else if("=".equals(low_con)) {
+                            isCopyTarget = (low_ver == version) && isCopyTarget;
+                        }
+                    } else if(high_con != null) {
+                        if("<=".equals(high_con)) {
+                            isCopyTarget = (version <= high_ver) && isCopyTarget;
+                        } else if("<".equals(high_con)) {
+                            isCopyTarget = (version < high_ver) && isCopyTarget;
+                        } else if("=".equals(high_con)) {
+                            isCopyTarget = (version == high_ver) && isCopyTarget;
+                        }
+                    } else {
+                        throw new Exception("JavaVersion condition is invalid. condition=" + line);
+                    }
+                }
+                
+            }
+            if(isJavaVersionExists && isCopyTarget) {
+                String tmpFileName = file.getAbsolutePath().substring(fromDir.getAbsolutePath().length());
+                File toFile = new File(toDir.getAbsolutePath() + tmpFileName.substring(0, tmpFileName.lastIndexOf(".") + 1) + toFileExtention);
+                FileUtility.dataCopy(file, toFile);
+            }
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (Exception e) {
+                }
+            }
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (Exception e) {
+                }
+            }
+        }
+        
+        
     }
     
 }

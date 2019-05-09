@@ -146,22 +146,20 @@ import jdk.internal.reflect.ReflectionFactory;
 | 設定キー | 説明 | 必須 | デフォルト値 | 設定例 |
 |---|---|---|---|---|
 | javaVersion | コンパイルに使用するJavaのバージョン ||System.getProperty("java.specification.version")で取得できるJavaバージョン| 8 |
-| targetJavaVersionAndFiles| Javaのバージョンと置換チェックするファイル | ○ | 無し | 6,jp/ossc/nimbus/**/.*.jpp（※１） |
-| fromDir | 置換元ファイルルートディレクトリ | ○ | 無し | ${basedir}/src/main/java |
-| toDir | 置換後ファイルコピー先ルートディレクトリ | ○ | 無し | ${basedir}/target/gen-src |
-| toFileExtention | 置換後ファイル拡張子 | | java | java |
-
-※１ 複数指定が可能なため、`<param>XXXX</param>`で複数記載する。
+| fromDir | コピー元ファイルルートディレクトリ | ○ | 無し | ${basedir}/src/main/java |
+| toDir | コピー後ファイルコピー先ルートディレクトリ | ○ | 無し | ${basedir}/target/gen-src |
+| fromFileExtention | コピー対象ファイル拡張子 | ○ | 無し | javapp |
+| toFileExtention | コピー後ファイル拡張子 | | java | java |
+| encoding | ファイルの読み込み書き込みEncoding | | システムのデフォルトエンコーディング | UTF-8 |
 
 ### 設定例
 
 + Java8でコンパイル
-+ Java6でコンパイルする場合は正規表現（jp/ossc/nimbus/service/\*\*/.\*.jppとjp/ossc/nimbus/util/\*\*/.\*.jpp）をコピー対象とする
-+ Java7でコンパイルする場合は正規表現（jp/ossc/nimbus/service/\*\*/.\*.jppとjp/ossc/nimbus/util/\*\*/.\*.jpp）をコピー対象とする
-+ Java8でコンパイルする場合は正規表現（jp/ossc/nimbus/service/\*\*/.\*.jppとjp/ossc/nimbus/util/\*\*/.\*.jpp）をコピー対象とする
-+ /src/main/java 配下のソースが置換対象
-+ /target/gen-src に置換後ファイルを配置
-+ 置換後のファイル拡張子はjava
++ /src/main/java 配下のソースがコピー対象
++ /target/gen-src にコピー後ファイルを配置
++ javappがコピー対象ファイル拡張子
++ コピー後のファイル拡張子はjava
++ ソースファイルのエンコーディングはUTF-8
 
 ```xml
         <plugins>
@@ -180,11 +178,8 @@ import jdk.internal.reflect.ReflectionFactory;
                             <javaVersion>8</javaVersion>
                             <fromDir>${basedir}/src/main/java</fromDir>
                             <toDir>${basedir}/target/gen-src</toDir>
-                            <targetJavaVersionAndFiles>
-                                <param>6,jp/ossc/nimbus/service/**/.*.jpp,jp/ossc/nimbus/util/**/.*.jpp</param>
-                                <param>7,jp/ossc/nimbus/service/**/.*.jpp,jp/ossc/nimbus/util/**/.*.jpp</param>
-                                <param>8,jp/ossc/nimbus/service/**/.*.jpp,jp/ossc/nimbus/util/**/.*.jpp</param>
-                            </targetJavaVersionAndFiles>
+                            <fromFileExtention>javapp</fromFileExtention>
+                            <toFileExtention>java</toFileExtention>
                         </configuration>
                     </execution>
                 </executions>
@@ -192,3 +187,19 @@ import jdk.internal.reflect.ReflectionFactory;
             ・・・
         </plugins>
 ```
+### ファイルコピールール
+コピー元ファイルディレクトリからコピー対象ファイル拡張子のファイルを検索し、そのファイルに記載されたコピールールに従ってコピー後ディレクトリにファイルをコピーする
+
+#### コピー条件記載ルール
+チェック対象JavaのVersionを@JAVA_VERSION@とし、不等号（=、<、<=）で有効なVersionを指定する
+
+#### 使用可能条件
+| 条件文字列 | 説明 | 設定例 | 設定例説明 |
+|---|---|---|---|
+| = | 対象のJavaバージョンと等しい場合に有効となる |@JAVA_VERSION@=8| Java8でコンパイルする場合に有効となる |
+| < | 対象のJavaバージョンより大きい、小さい場合に有効となる |6<@JAVA_VERSION@<9| Java6より大きく、Java9より小さいバージョンでコンパイルする場合に有効となる |
+| <= | 対象のJavaバージョン以上、以下の場合に有効となる |6<=@JAVA_VERSION@<=9| Java6以上、Java9以下のバージョンでコンパイルする場合に有効となる |
+
+### ソース記載例
+Java6以上、Java9より小さい場合にコピーを行う。
+// 6<=@JAVA_VERSION@<9
