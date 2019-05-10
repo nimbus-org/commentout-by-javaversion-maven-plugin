@@ -68,7 +68,7 @@ public class CopyMojo extends AbstractMojo {
     /**
      * @parameter
      */
-    private String fromFileExtention = "javapp";
+    private String fromFileExtention = "javacp";
     
     /**
      * @parameter
@@ -288,6 +288,7 @@ public class CopyMojo extends AbstractMojo {
                 String tmpFileName = file.getAbsolutePath().substring(fromDir.getAbsolutePath().length());
                 File toFile = new File(toDir.getAbsolutePath() + tmpFileName.substring(0, tmpFileName.lastIndexOf(".") + 1) + toFileExtention);
                 FileUtility.dataCopy(file, toFile);
+                getLog().info("File copy from=" + file.getAbsolutePath() + " to=" + toFile.getAbsolutePath());
             }
         } finally {
             if (br != null) {

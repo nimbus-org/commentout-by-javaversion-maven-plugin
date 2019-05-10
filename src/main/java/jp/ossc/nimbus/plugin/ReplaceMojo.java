@@ -66,7 +66,7 @@ public class ReplaceMojo extends AbstractMojo {
     /**
      * @parameter
      */
-    private String[] checkJavaVersions = new String[] { "6", "7", "8", "9" };
+    private String[] checkJavaVersions = new String[] { "6", "7", "8", "9", "10", "11" };
     
     /**
      * @parameter
@@ -86,7 +86,7 @@ public class ReplaceMojo extends AbstractMojo {
     /**
      * @parameter
      */
-    private String fromFileExtention;
+    private String fromFileExtention = "javacm";
     
     /**
      * @parameter
@@ -209,7 +209,7 @@ public class ReplaceMojo extends AbstractMojo {
                                 toDir.getAbsolutePath() + tmpFileName.substring(0, tmpFileName.lastIndexOf(fromFileExtention)) + toFileExtention);
                         FileUtility.dataCopy(targetFile, toFile);
                         replace(toFile);
-                        getLog().debug("file copy " + targetFile.getAbsolutePath() + " to " + toFile.getAbsolutePath());
+                        getLog().info("File copy from=" + targetFile.getAbsolutePath() + " to=" + toFile.getAbsolutePath());
                     }
                 }
             }
