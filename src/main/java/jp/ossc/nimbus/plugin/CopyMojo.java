@@ -96,11 +96,11 @@ public class CopyMojo extends AbstractMojo {
             if (javaVersion == null || "".equals(javaVersion)) {
                 getLog().info("javaVersion is not found config.");
                 javaVersion = System.getProperty("java.specification.version");
-                if(javaVersion.startsWith("1.")) {
-                    javaVersion = javaVersion.substring(2);
-                }
-                getLog().info("check from system javaVersion. javaVersion=" + javaVersion);
             }
+            if(javaVersion.startsWith("1.")) {
+                javaVersion = javaVersion.substring(2);
+            }
+            getLog().info("check from system javaVersion. javaVersion=" + javaVersion);
             
             if (fromDir == null) {
                 getLog().error("fromDir is null.");

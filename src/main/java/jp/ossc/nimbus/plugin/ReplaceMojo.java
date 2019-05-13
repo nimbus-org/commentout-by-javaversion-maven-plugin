@@ -120,11 +120,11 @@ public class ReplaceMojo extends AbstractMojo {
             if (javaVersion == null || "".equals(javaVersion)) {
                 getLog().info("javaVersion is not found config.");
                 javaVersion = System.getProperty("java.specification.version");
-                if(javaVersion.startsWith("1.")) {
-                    javaVersion = javaVersion.substring(2);
-                }
-                getLog().info("check from system javaVersion. javaVersion=" + javaVersion);
             }
+            if(javaVersion.startsWith("1.")) {
+                javaVersion = javaVersion.substring(2);
+            }
+            getLog().info("check from system javaVersion. javaVersion=" + javaVersion);
             
             if(checkJavaVersions == null || checkJavaVersions.length == 0) {
                 getLog().error("checkJavaVersions is null or empty.");
