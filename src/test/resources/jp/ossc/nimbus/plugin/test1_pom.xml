@@ -19,12 +19,13 @@
                     <fromFileExtention>txt</fromFileExtention>
                     <toFileExtention>java</toFileExtention>
                     <encoding>UTF-8</encoding>
-                    <javaVersion>8</javaVersion>
+                    <javaVersion>11</javaVersion>
                     <checkJavaVersions>
                         <param>6</param>
                         <param>7</param>
                         <param>8</param>
                         <param>9</param>
+                        <param>11</param>
                     </checkJavaVersions>
                     <replaceTargetDirs>
                         <param>1/1_1</param>
