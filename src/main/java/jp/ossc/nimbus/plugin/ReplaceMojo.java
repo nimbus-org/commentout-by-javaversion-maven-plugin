@@ -234,7 +234,7 @@ public class ReplaceMojo extends AbstractMojo {
             String line = null;
             while ((line = br.readLine()) != null) {
                 for (String checkJavaVersion : checkJavaVersions) {
-                    int compareTo = javaVersion.compareTo(checkJavaVersion);
+                    int compareTo = Integer.parseInt(javaVersion) - Integer.parseInt(checkJavaVersion);
                     if (compareTo == 0) {
                         line = line.replaceAll("@START=JAVA" + checkJavaVersion + "@", REPLACE_EMPTY_STR);
                         line = line.replaceAll("@END=JAVA" + checkJavaVersion + "@", REPLACE_EMPTY_STR);
